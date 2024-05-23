@@ -1,6 +1,6 @@
-# Multi-lingual Transcription using Whisper
+# My AI Toolbox
 
-This is a simple web application that allows users to transcribe audio files into text using the [Whisper Automatic Speech Recognition (ASR) model](https://github.com/openai/whisper). The application is built using Streamlit and leverages OpenAI's Whisper to perform transcriptions.
+This is a simple web application that allows users to do multiple things which I think are useful to me. Now it only contains a couple of tools like simpel chat, transciption and summization of audio file like meetings and a tool to get a summary of a webpage. The application is built using Streamlit and leverages OpenAI's Whisper to perform transcriptions.
 
 ## How to Use
 
