@@ -18,6 +18,7 @@ To run this application locally, you need to have Python installed along with th
 * Whisper
 * Ollama
 * Requests
+* Newspaper3k
 
 You can install the required packages using the following commands:
 ```
@@ -25,6 +26,7 @@ pip install streamlit
 pip install whisper
 pip install ollama
 pip install requests
+pip install newspaper3k
 ```
 
 ## How to Run
@@ -32,7 +34,7 @@ pip install requests
 * Clone this repository to your local machine.
 * Open a terminal or command prompt and navigate to the repository's directory.
 * Run the Streamlit application: `streamlit run main.py`
-* The application will open in your web browser, and you can start transcribing audio files right away.
+* The application will open in your web browser, and you can start using the tools right away.
 
 ## Applications
 
@@ -49,4 +51,4 @@ pip install requests
 The application includes the following tabs:
 * **Ollama Chat**: Interact with the Ollama chat model.
 * **Whisper App**: Transcribe and summarize audio files.
-* **Web Summary**: Summarize content from a given URL (currently commented out in the code).
+* **Web Summary**: Summarize content from a given URL.
