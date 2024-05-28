@@ -19,7 +19,7 @@ def create_whisper_app():
   audio_file = st.file_uploader("Upload your audio", type=["wav", "mp3", "m4a"])
   model = whisper.load_model("base")
 
-  if st.sidebar.button("Transcribe Audio"):
+  if st.button("Transcribe Audio"):
     if audio_file is not None:
       with st.status("Start transcribing...",expanded=True) as status:
         # Detect language
@@ -62,23 +62,23 @@ def create_whisper_app():
         st.divider()
 
         # Summarization with Ollama (assuming Ollama is implemented elsewhere)
-        st.sidebar.success("Summarizing...")
+        st.success("Summarizing...")
         prompt = system_prompt + transcription["text"]
 
         try:
           summary = llm.invoke(prompt)  # Assuming llm is defined elsewhere (e.g., imported from main.py)
         except Exception as e:
-          st.sidebar.error(f"Error during summarization: {e}")
+          st.error(f"Error during summarization: {e}")
           summary = "An error occurred while summarizing the transcript."
 
         # Print the summary
-        st.sidebar.success("Summary complete")
+        st.success("Summary complete")
         st.markdown(summary)
 
         # Clean up the temporary file after processing
         os.remove(audio_file_path)
     else:
-      st.sidebar.error("Please upload an audio file.")
+      st.error("Please upload an audio file.")
 
 
 # Call the function within your main app (main.py)

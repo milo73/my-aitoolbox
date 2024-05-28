@@ -2,8 +2,6 @@ import streamlit as st
 import ollama
 import requests
 import newspaper
-import json
-
 from typing import Dict, Iterable
 
 def create_web_summary_app():
