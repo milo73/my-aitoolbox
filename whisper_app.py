@@ -4,6 +4,7 @@ import tempfile
 import os
 from langchain_community.llms import Ollama
 llm = Ollama(model="llama3")
+from ollama_utils import fetch_ollama_replies, get_models
 
 
 def create_whisper_app():
@@ -79,7 +80,3 @@ def create_whisper_app():
         os.remove(audio_file_path)
     else:
       st.error("Please upload an audio file.")
-
-
-# Call the function within your main app (main.py)
-# create_whisper_app()

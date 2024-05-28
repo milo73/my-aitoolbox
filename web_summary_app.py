@@ -1,5 +1,5 @@
 import streamlit as st
-import ollama
+import ollama_utils
 import requests
 import newspaper
 from typing import Dict, Iterable
@@ -16,11 +16,11 @@ def create_web_summary_app():
     if url:
         try:
             web_content = fetch_web_content(url)
-            models = get_models()
+            models = ollama_utils.get_models()
             if models:
                 model = models[0]  # Assuming the first model is suitable for summarization
                 chat_history = [{"role": "user", "content": f"Your task is to summarise the content of the page, which is a news article. Only extract the relevant context. Ignore the CSS and other HTML code. Also try to ignore the JavaScript code. Ignore the privacy policy. Summarize this content: {web_content}"}]
-                summary_generator = fetch_ollama_replies(model, chat_history)
+                summary_generator = ollama_utils.fetch_ollama_replies(model, chat_history)
                 summary = " ".join([response for response in summary_generator])
                 st.write("Summary:")
                 st.write(summary)
@@ -50,12 +50,3 @@ def fetch_web_content(url: str) -> str:
         "content": str(article.text)
     }
     return article
-
-def fetch_ollama_replies(model: str, chat_history: Dict) -> Iterable:
-    responses = ollama.chat(model=model, messages=chat_history, stream=True)
-    for response in responses:
-        yield response['message']['content']
-
-def get_models() -> list[str]:
-    return [model["name"] for model in ollama.list()["models"]]
-
