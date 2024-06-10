@@ -16,14 +16,16 @@ def create_web_summary_app():
     if url:
         try:
             web_content = fetch_web_content(url)
+            print(web_content)
             models = ollama_utils.get_models()
             if models:
                 model = models[0]  # Assuming the first model is suitable for summarization
-                chat_history = [{"role": "user", "content": f"Your task is to summarise the content of the page, which is a news article. Only extract the relevant context. Ignore the CSS and other HTML code. Also try to ignore the JavaScript code. Ignore the privacy policy. Summarize this content: {web_content}"}]
-                summary_generator = ollama_utils.fetch_ollama_replies(model, chat_history)
-                summary = " ".join([response for response in summary_generator])
-                st.write("Summary:")
-                st.write(summary)
+                system_prompt = "Your task is to summarise the content of the page, which is a news article. Only extract the relevant context. Ignore the CSS and other HTML code. Also try to ignore the JavaScript code. Ignore the privacy policy. Provide the summary in markdown format. Summarize this content: "
+                prompt = system_prompt + str(web_content)
+                summary = ollama_utils.generate_summary(model, prompt)
+                print(summary)
+                st.markdown("Summary:")
+                st.markdown(summary)
             else:
                 st.error("No models available for summarization.")
         except requests.exceptions.RequestException as e:
