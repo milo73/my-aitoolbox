@@ -6,10 +6,7 @@ def create_ollama_chat_app():
   This function builds the Streamlit UI and functionalities for the Ollama chat app.
   """
 
-  with st.sidebar:
-      st.session_state.selected_model = st.selectbox("Active model:", ollama_utils.get_models())
-      st.caption("streamlit + ollama chatbot boilerplate")
-
+  st.session_state.selected_model = ollama_utils.get_models()[0]
   st.title("Chat with " + st.session_state.selected_model)
 
   if "selected_model" not in st.session_state:

@@ -2,9 +2,9 @@ import streamlit as st
 import whisper
 import tempfile
 import os
+import ollama_utils
 from langchain_community.llms import Ollama
 llm = Ollama(model="llama3")
-from ollama_utils import fetch_ollama_replies, get_models
 
 
 def create_whisper_app():
@@ -18,7 +18,7 @@ def create_whisper_app():
   system_prompt = st.text_input("System Prompt", "You are a professional writer and reliable, professional minute-maker. Create accurate minutes of the following transcription: ")
 
   audio_file = st.file_uploader("Upload your audio", type=["wav", "mp3", "m4a"])
-  model = whisper.load_model("base")
+  model = whisper.load_model(os.getenv("WHISPER_MODEL"))
 
   if st.button("Transcribe Audio"):
     if audio_file is not None:
@@ -65,12 +65,7 @@ def create_whisper_app():
         # Summarization with Ollama (assuming Ollama is implemented elsewhere)
         st.success("Summarizing...")
         prompt = system_prompt + transcription["text"]
-
-        try:
-          summary = llm.invoke(prompt)  # Assuming llm is defined elsewhere (e.g., imported from main.py)
-        except Exception as e:
-          st.error(f"Error during summarization: {e}")
-          summary = "An error occurred while summarizing the transcript."
+        summary = ollama_utils.generate_summary(llm.model, prompt)
 
         # Print the summary
         st.success("Summary complete")
