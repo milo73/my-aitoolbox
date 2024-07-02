@@ -14,6 +14,7 @@ WHISPER_MODEL = os.getenv("WHISPER_MODEL")
 from ollama_chat_app import create_ollama_chat_app
 from whisper_app import create_whisper_app
 from web_summary_app import create_web_summary_app
+from whisper_srt_app import create_whisper_srt_app
 
 with st.sidebar:
       st.header("LLM Model")
@@ -26,7 +27,7 @@ with st.sidebar:
 
 # Create tabs for each app
 #tab1, tab2 = st.tabs(["Ollama Chat", "Whisper App"])
-tab1, tab2, tab3 = st.tabs(["Ollama Chat", "Whisper App", "Website Summary"])
+tab1, tab2, tab3, tab4 = st.tabs(["Ollama Chat", "Whisper App", "Website Summary", "Whisper SRT"])
 
 with tab1:
   create_ollama_chat_app(model_name, temperature)  # Initializes the Ollama Chat app within the first tab
