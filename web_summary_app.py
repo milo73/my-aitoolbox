@@ -4,7 +4,7 @@ import requests
 import newspaper
 from typing import Dict, Iterable
 
-def create_web_summary_app():
+def create_web_summary_app(model: str, temperature: float):
     """
     This function builds the Streamlit UI and functionalities for the Ollama chat app,
     fetches content from a given URL, sends it to the Ollama model for summarization,
@@ -17,17 +17,12 @@ def create_web_summary_app():
         try:
             web_content = fetch_web_content(url)
             print(web_content)
-            models = ollama_utils.get_models()
-            if models:
-                model = models[0]  # Assuming the first model is suitable for summarization
-                system_prompt = "Your task is to summarise the content of the page, which is a news article. Only extract the relevant context. Ignore the CSS and other HTML code. Also try to ignore the JavaScript code. Ignore the privacy policy. Provide the summary in markdown format. Summarize this content: "
-                prompt = system_prompt + str(web_content)
-                summary = ollama_utils.generate_summary(model, prompt)
-                print(summary)
-                st.markdown("Summary:")
-                st.markdown(summary)
-            else:
-                st.error("No models available for summarization.")
+            system_prompt = "Your task is to summarise the content of the page, which is a news article. Only extract the relevant context. Ignore the CSS and other HTML code. Also try to ignore the JavaScript code. Ignore the privacy policy. Provide the summary in markdown format. Summarize this content: "
+            prompt = system_prompt + str(web_content)
+            summary = ollama_utils.generate_summary(model, prompt, temperature)
+            print(summary)
+            st.markdown("Summary:")
+            st.markdown(summary)
         except requests.exceptions.RequestException as e:
             st.error(f"Error fetching the webpage: {e}")
     else:

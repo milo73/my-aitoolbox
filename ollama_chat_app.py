@@ -1,12 +1,12 @@
 import streamlit as st
 import ollama_utils
 
-def create_ollama_chat_app():
+def create_ollama_chat_app(model: str, temperature: float):
   """
   This function builds the Streamlit UI and functionalities for the Ollama chat app.
   """
-
-  st.session_state.selected_model = ollama_utils.get_models()[0]
+  print(temperature)
+  st.session_state.selected_model = model
   st.title("Chat with " + st.session_state.selected_model)
 
   if "selected_model" not in st.session_state:
@@ -25,7 +25,7 @@ def create_ollama_chat_app():
           st.markdown(prompt)
       with st.chat_message("assistant"):
           response = st.write_stream(ollama_utils.fetch_ollama_replies(
-              st.session_state.selected_model, st.session_state.messages))
+              st.session_state.selected_model, st.session_state.messages, temperature))
             
       st.session_state.messages.append(
           {"role": "assistant", "content": response})

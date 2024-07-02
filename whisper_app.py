@@ -7,7 +7,7 @@ from langchain_community.llms import Ollama
 llm = Ollama(model="llama3")
 
 
-def create_whisper_app():
+def create_whisper_app(whisper_model: str, model_name: str, temperature: float):
   """
   This function builds the Streamlit UI and functionalities for the Whisper audio summarization app.
   """
@@ -16,9 +16,8 @@ def create_whisper_app():
 
   # Text prompt to guide the summarization process
   system_prompt = st.text_input("System Prompt", "You are a professional writer and reliable, professional minute-maker. Create accurate minutes of the following transcription: ")
-
   audio_file = st.file_uploader("Upload your audio", type=["wav", "mp3", "m4a"])
-  model = whisper.load_model(os.getenv("WHISPER_MODEL"))
+  whisper_model = whisper.load_model(whisper_model)
 
   if st.button("Transcribe Audio"):
     if audio_file is not None:
@@ -38,10 +37,10 @@ def create_whisper_app():
         audio = whisper.pad_or_trim(audio)
 
         # Make log-Mel spectrogram and move to the same device as the model
-        mel = whisper.log_mel_spectrogram(audio).to(model.device)
+        mel = whisper.log_mel_spectrogram(audio).to(whisper_model.device)
 
         # Detect the spoken language
-        _, probs = model.detect_language(mel)
+        _, probs = whisper_model.detect_language(mel)
         st.write(f"Detected language: {max(probs, key=probs.get)}")
 
         # Start transcribing
@@ -49,13 +48,13 @@ def create_whisper_app():
 
         # Decode the audio
         options = whisper.DecodingOptions(fp16=False)
-        result = whisper.decode(model, mel, options)
+        result = whisper.decode(whisper_model, mel, options)
 
         # Print the recognized text
         st.markdown(result.text)
         st.divider()
 
-        transcription = model.transcribe(audio_file_path, task='translate', fp16=False)
+        transcription = whisper_model.transcribe(audio_file_path, task='translate', fp16=False)
         status.update(label="Transcription complete!", state="complete", expanded=False)
 
         # Print the transcribed text
@@ -65,7 +64,7 @@ def create_whisper_app():
         # Summarization with Ollama (assuming Ollama is implemented elsewhere)
         st.success("Summarizing...")
         prompt = system_prompt + transcription["text"]
-        summary = ollama_utils.generate_summary(llm.model, prompt)
+        summary = ollama_utils.generate_summary(model_name, prompt, temperature)
 
         # Print the summary
         st.success("Summary complete")

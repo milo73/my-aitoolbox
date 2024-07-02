@@ -22,17 +22,20 @@ with st.sidebar:
       st.session_state.selected_model = model_name
 
       st.header("Whisper Model")
-      model_name = st.text_input("Model name", value=WHISPER_MODEL)
+      whisper_model = st.text_input("Model name", value=WHISPER_MODEL)
 
 # Create tabs for each app
 #tab1, tab2 = st.tabs(["Ollama Chat", "Whisper App"])
 tab1, tab2, tab3 = st.tabs(["Ollama Chat", "Whisper App", "Website Summary"])
 
 with tab1:
-  create_ollama_chat_app()  # Initializes the Ollama Chat app within the first tab
+  create_ollama_chat_app(model_name, temperature)  # Initializes the Ollama Chat app within the first tab
 
 with tab2:
-  create_whisper_app()  # Initializes the Whisper app within the second tab
+  create_whisper_app(whisper_model, model_name, temperature)  # Initializes the Whisper app within the second tab
 
 with tab3:
-  create_web_summary_app()  # The code for initializing a Website Summary app is commented out
+  create_web_summary_app(model_name, temperature)  # The code for initializing a Website Summary app is commented out
+
+with tab4:
+  create_whisper_srt_app(whisper_model, model_name, temperature)  # The code for initializing a Website Summary app is commented out
