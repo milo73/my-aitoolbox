@@ -1,0 +1,9 @@
+streamlit
+openai-whisper
+ollama
+requests
+newspaper4k
+lxml[html_clean]
+python-dotenv
+langchain-community
+torch

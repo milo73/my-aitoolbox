@@ -1,14 +1,12 @@
-import os
+"""
+AI Toolbox - Main application entry point.
+
+A versatile web application that offers a suite of AI-powered tools including
+Ollama chat, audio transcription/summarization, web content summarization,
+and subtitle creation.
+"""
 import streamlit as st
-from dotenv import load_dotenv 
-
-load_dotenv()
-
-# Load model parameters
-MODEL_NAME = os.getenv("MODEL_NAME")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_URL = os.getenv("OPENAI_URL")
-WHISPER_MODEL = os.getenv("WHISPER_MODEL")
+from config import Config
 
 # Import functions from individual apps
 from ollama_chat_app import create_ollama_chat_app
@@ -16,27 +14,111 @@ from whisper_app import create_whisper_app
 from web_summary_app import create_web_summary_app
 from whisper_srt_app import create_whisper_srt_app
 
-with st.sidebar:
-      st.header("LLM Model")
-      model_name = st.text_input("Model name", value=MODEL_NAME)
-      temperature = st.slider("Temperature", value=0.1, min_value=0.0, max_value=1.0)
-      st.session_state.selected_model = model_name
+# Configure Streamlit page
+st.set_page_config(
+    page_title="AI Toolbox",
+    page_icon="🤖",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-      st.header("Whisper Model")
-      whisper_model = st.text_input("Model name", value=WHISPER_MODEL)
+# Custom CSS for better styling
+st.markdown("""
+    <style>
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .main-header {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .sub-header {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 2rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Header
+st.markdown('<p class="main-header">🤖 AI Toolbox</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Powerful AI tools for chat, transcription, and content analysis</p>', unsafe_allow_html=True)
+
+# Sidebar configuration
+with st.sidebar:
+    st.title("⚙️ Settings")
+
+    st.markdown("---")
+
+    # LLM Model Configuration
+    with st.expander("🤖 LLM Model", expanded=True):
+        model_name = st.text_input(
+            "Model name",
+            value=Config.MODEL_NAME,
+            help="Enter the name of your Ollama model (e.g., llama3, mistral, codellama)"
+        )
+        temperature = st.slider(
+            "Temperature",
+            value=0.1,
+            min_value=0.0,
+            max_value=1.0,
+            step=0.1,
+            help="Higher values make output more random, lower values more deterministic"
+        )
+        st.session_state.selected_model = model_name
+
+    # Whisper Model Configuration
+    with st.expander("🎙️ Whisper Model", expanded=False):
+        whisper_model = st.selectbox(
+            "Model size",
+            options=["tiny", "base", "small", "medium", "large"],
+            index=["tiny", "base", "small", "medium", "large"].index(Config.WHISPER_MODEL) if Config.WHISPER_MODEL in ["tiny", "base", "small", "medium", "large"] else 1,
+            help="Larger models are more accurate but slower. Base is recommended for most use cases."
+        )
+        st.info("💡 **Model sizes:**\n- Tiny: Fastest, least accurate\n- Base: Good balance\n- Small: Better accuracy\n- Medium/Large: Best accuracy, slower")
+
+    st.markdown("---")
+
+    # About section
+    with st.expander("ℹ️ About", expanded=False):
+        st.markdown("""
+        **AI Toolbox** provides:
+        - 💬 Chat with local LLMs via Ollama
+        - 🎙️ Audio transcription & summarization
+        - 🌐 Web content summarization
+        - 📝 Video subtitle generation
+
+        **Requirements:**
+        - Ollama installed and running
+        - Whisper models downloaded
+        - FFmpeg for audio/video processing
+        """)
+
+    st.markdown("---")
+    st.caption("Made with ❤️ using Streamlit, Ollama & Whisper")
 
 # Create tabs for each app
-#tab1, tab2 = st.tabs(["Ollama Chat", "Whisper App"])
-tab1, tab2, tab3, tab4 = st.tabs(["Ollama Chat", "Whisper App", "Website Summary", "Whisper SRT"])
+tab1, tab2, tab3, tab4 = st.tabs([
+    "💬 Ollama Chat",
+    "🎙️ Audio Summary",
+    "🌐 Website Summary",
+    "📝 Subtitle Creation"
+])
 
 with tab1:
-  create_ollama_chat_app(model_name, temperature)  # Initializes the Ollama Chat app within the first tab
+    create_ollama_chat_app(model_name, temperature)
 
 with tab2:
-  create_whisper_app(whisper_model, model_name, temperature)  # Initializes the Whisper app within the second tab
+    create_whisper_app(whisper_model, model_name, temperature)
 
 with tab3:
-  create_web_summary_app(model_name, temperature)  # The code for initializing a Website Summary app is commented out
+    create_web_summary_app(model_name, temperature)
 
 with tab4:
-  create_whisper_srt_app(whisper_model, model_name, temperature)  # The code for initializing a Website Summary app is commented out
+    create_whisper_srt_app(whisper_model, model_name, temperature)

@@ -1,111 +1,251 @@
-# AI Toolbox
+# 🤖 AI Toolbox
 
-AI Toolbox is a versatile web application that offers a suite of AI-powered tools for various tasks. Built with Streamlit, it leverages OpenAI's Whisper for audio processing and Ollama for language model interactions.
+AI Toolbox is a powerful, all-in-one web application that brings together AI-powered tools for chat, transcription, and content analysis. Built with Streamlit, it leverages OpenAI's Whisper for audio/video processing and Ollama for local language model interactions.
 
-## Features
+![AI Toolbox](overview.png)
 
-The application consists of four main tabs:
+## ✨ Features
 
-1. **Ollama Chat**: Engage in conversations with various language models via the Ollama API.
-2. **Audio Summary**: Transcribe and summarize audio files in multiple languages using Whisper.
-3. **Web Summary**: Generate concise summaries of web content from URLs.
-4. **Subtitle Creation**: Transcribe video files and create SRT subtitle files from the transcriptions.
+### 💬 Ollama Chat
+Engage in intelligent conversations with local LLMs through an intuitive chat interface.
+- **Stream responses** in real-time
+- **Adjustable temperature** for response creativity
+- **Clear chat history** functionality
+- **Multiple model support** (llama3, mistral, codellama, etc.)
 
-## Requirements
+### 🎙️ Audio Transcription & Summarization
+Transcribe and summarize audio files in 90+ languages with AI assistance.
+- **Multi-language support** with automatic detection
+- **Customizable prompts** for summarization
+- **Download transcriptions** and summaries
+- **Supports WAV, MP3, and M4A** formats
 
-- Python 3.7+
-- Streamlit
-- Whisper
-- Ollama
-- Requests
-- Newspaper3k
-- FFmpeg (for audio processing)
+### 🌐 Website Content Summarizer
+Extract and summarize content from any public webpage.
+- **AI-powered summarization** of articles and blogs
+- **Article metadata extraction** (title, authors, keywords)
+- **URL security validation** (prevents SSRF attacks)
+- **Content statistics** and insights
 
-## Installation
+### 📝 Video Subtitle Generator
+Automatically generate industry-standard SRT subtitle files from videos.
+- **Automatic language detection**
+- **Precise timing** for each subtitle segment
+- **Download ready-to-use SRT files**
+- **Supports MP4 and MOV** formats
 
-1. Clone the repository:
-   ```
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Python 3.10-3.13** (Python 3.14+ not yet supported by some dependencies)
+- **FFmpeg** for audio/video processing
+- **Ollama** for LLM inference
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
    git clone https://github.com/yourusername/ai-toolbox.git
    cd ai-toolbox
    ```
 
-2. Install the required Python packages:
+2. **Create and activate a virtual environment:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
+
+3. **Install Python dependencies:**
+   ```bash
    pip install -r requirements.txt
    ```
 
-3. Install FFmpeg:
-   - On Ubuntu or Debian: `sudo apt-get install ffmpeg`
-   - On macOS with Homebrew: `brew install ffmpeg`
-   - On Windows: Download from [FFmpeg official website](https://ffmpeg.org/download.html)
+4. **Install FFmpeg:**
+   - **Ubuntu/Debian:** `sudo apt-get install ffmpeg`
+   - **macOS:** `brew install ffmpeg`
+   - **Windows:** Download from [FFmpeg website](https://ffmpeg.org/download.html)
 
-4. Set up Ollama:
-   Follow the instructions on the [Ollama GitHub page](https://github.com/jmorganca/ollama) to install and set up Ollama on your system.
+5. **Install and set up Ollama:**
+   ```bash
+   # macOS/Linux
+   curl -fsSL https://ollama.com/install.sh | sh
 
-5. Configure environment variables:
-   Create a `.env` file in the project root and add the following:
-   ```
-   MODEL_NAME=your_default_model_name
-   WHISPER_MODEL=base
-   ```
+   # Pull a model (e.g., llama3)
+   ollama pull llama3
 
-## Usage
-
-1. Start the application:
-   ```
-   streamlit run main.py
+   # Start Ollama server
+   ollama serve
    ```
 
-2. Open your web browser and navigate to the provided local URL (usually http://localhost:8501).
+   Visit [Ollama's website](https://ollama.com/) for Windows installation.
 
-3. Use the tabs at the top of the page to switch between different tools:
+6. **Configure environment variables:**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your preferred settings
+   ```
 
-### Ollama Chat
-- Select a language model from the sidebar.
-- Type your message in the chat input and press Enter to send.
-- View the model's responses in the chat history.
+### Running the Application
 
-### Audio Summary
-- Upload an audio file (WAV, MP3, or M4A format).
-- Click "Transcribe Audio" to start the process.
-- View the detected language, transcription, and summary.
+```bash
+streamlit run main.py
+```
 
-### Web Summary
-- Enter a URL in the text input field.
-- Click the summarize button to generate a concise summary of the web content.
+The application will open in your default browser at `http://localhost:8501`
 
-### Subtitle Creation
-- Upload a video file (MP4 or MOV format).
-- Click "Transcribe Video" to start the process.
-- Once complete, you can download the generated SRT subtitle file.
+## ⚙️ Configuration
 
-## Supported Languages
+Edit the `.env` file to customize your setup:
 
-The Whisper model supports a wide range of languages for audio transcription and summarization, including but not limited to:
+```env
+# Ollama Model (check available models: ollama list)
+MODEL_NAME=llama3
 
-Afrikaans, Arabic, Armenian, Azerbaijani, Belarusian, Bosnian, Bulgarian, Catalan, Chinese, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, Galician, German, Greek, Hebrew, Hindi, Hungarian, Icelandic, Indonesian, Italian, Japanese, Kannada, Kazakh, Korean, Latvian, Lithuanian, Macedonian, Malay, Marathi, Maori, Nepali, Norwegian, Persian, Polish, Portuguese, Romanian, Russian, Serbian, Slovak, Slovenian, Spanish, Swahili, Swedish, Tagalog, Tamil, Thai, Turkish, Ukrainian, Urdu, Vietnamese, and Welsh.
+# Whisper Model (tiny, base, small, medium, large)
+WHISPER_MODEL=base
 
-## Privacy and Security
+# API Configuration (for future use)
+OPENAI_URL=http://localhost:11434/v1
+OPENAI_API_KEY=ollama
+```
 
-- Temporary files (audio, video) are removed after processing to ensure data privacy.
-- No user data is stored or retained by the application.
-- All processing is done locally on your machine.
+### Whisper Model Selection Guide
 
-## Troubleshooting
+| Model | Speed | Accuracy | Use Case |
+|-------|-------|----------|----------|
+| tiny | ⚡⚡⚡⚡ | ⭐⭐ | Quick drafts, testing |
+| base | ⚡⚡⚡ | ⭐⭐⭐ | **Recommended** - Best balance |
+| small | ⚡⚡ | ⭐⭐⭐⭐ | Better accuracy needed |
+| medium | ⚡ | ⭐⭐⭐⭐⭐ | Professional use |
+| large | 🐌 | ⭐⭐⭐⭐⭐ | Maximum accuracy |
 
-- If you encounter issues with audio or video processing, ensure FFmpeg is correctly installed and accessible from the command line.
-- For Ollama-related problems, check the Ollama documentation and ensure the service is running correctly on your system.
+## 📖 Usage Guide
 
-## Contributing
+### 💬 Chat with LLMs
+1. Navigate to the **Ollama Chat** tab
+2. Configure model and temperature in the sidebar
+3. Type your message and press Enter
+4. Clear chat history anytime with the "Clear Chat" button
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### 🎙️ Transcribe & Summarize Audio
+1. Go to **Audio Summary** tab
+2. Upload an audio file (WAV, MP3, or M4A)
+3. Customize the system prompt (optional)
+4. Click "Transcribe & Summarize"
+5. Download transcription and summary
 
-## License
+### 🌐 Summarize Websites
+1. Open **Website Summary** tab
+2. Enter a public HTTP/HTTPS URL
+3. Click "Summarize Website"
+4. Review summary and article metadata
+5. Download summary as text file
+
+### 📝 Generate Video Subtitles
+1. Switch to **Subtitle Creation** tab
+2. Upload a video file (MP4 or MOV)
+3. Click "Generate Subtitles"
+4. Preview and download SRT file
+5. Use in video editors or players
+
+## 🌍 Supported Languages
+
+Whisper supports 90+ languages including:
+- **European:** English, Spanish, French, German, Italian, Portuguese, Dutch, Polish, Russian
+- **Asian:** Chinese, Japanese, Korean, Hindi, Arabic, Hebrew, Turkish
+- **And many more:** See full list in [Whisper documentation](https://github.com/openai/whisper)
+
+## 🔒 Security Features
+
+- ✅ **URL validation** prevents SSRF attacks
+- ✅ **Temporary file cleanup** ensures privacy
+- ✅ **Local processing** - no data sent to external servers
+- ✅ **Environment variable protection** via .gitignore
+- ✅ **Input sanitization** and error handling
+
+## 🛠️ Troubleshooting
+
+### Ollama Connection Issues
+```bash
+# Check if Ollama is running
+curl http://localhost:11434/api/tags
+
+# Start Ollama if not running
+ollama serve
+
+# List available models
+ollama list
+```
+
+### FFmpeg Issues
+```bash
+# Verify FFmpeg installation
+ffmpeg -version
+
+# If not found, install it
+# macOS: brew install ffmpeg
+# Linux: sudo apt-get install ffmpeg
+```
+
+### Python Version Issues
+Some dependencies (like numba) don't support Python 3.14 yet. Use Python 3.10-3.13:
+```bash
+# Check Python version
+python --version
+
+# Use pyenv to manage versions if needed
+pyenv install 3.13.0
+pyenv local 3.13.0
+```
+
+### Import Errors
+```bash
+# Ensure all dependencies are installed
+pip install -r requirements.txt
+
+# If issues persist, try upgrading pip
+pip install --upgrade pip
+```
+
+## 📦 Dependencies
+
+- **streamlit** - Web application framework
+- **openai-whisper** - Audio transcription
+- **ollama** - Local LLM inference
+- **newspaper4k** - Web content extraction
+- **lxml[html_clean]** - HTML parsing
+- **python-dotenv** - Environment configuration
+- **torch** - Deep learning backend
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- OpenAI for the Whisper model
-- Ollama team for their language model API
-- Streamlit team for the wonderful web app framework
+- [OpenAI Whisper](https://github.com/openai/whisper) - State-of-the-art speech recognition
+- [Ollama](https://ollama.com/) - Run LLMs locally with ease
+- [Streamlit](https://streamlit.io/) - Beautiful web apps for ML/AI
+- [newspaper4k](https://github.com/codelucas/newspaper) - Article extraction and parsing
+
+## 📞 Support
+
+If you encounter any issues or have questions:
+- Open an [issue](https://github.com/yourusername/ai-toolbox/issues)
+- Check existing issues for solutions
+- Review the troubleshooting section above
+
+---
+
+**Made with ❤️ using Streamlit, Ollama & Whisper**
