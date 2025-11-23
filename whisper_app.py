@@ -136,18 +136,17 @@ def process_audio(audio_file, whisper_model) -> Tuple[str, str]:
     """
     audio_path = None
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".tmp") as temp_audio:
+        # Get file extension from uploaded file
+        file_ext = audio_file.name.rsplit('.', 1)[-1] if '.' in audio_file.name else 'tmp'
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_ext}") as temp_audio:
             temp_audio.write(audio_file.read())
             audio_path = temp_audio.name
 
-        audio = whisper.load_audio(audio_path)
-        audio = whisper.pad_or_trim(audio)
-        mel = whisper.log_mel_spectrogram(audio).to(whisper_model.device)
-
-        _, probs = whisper_model.detect_language(mel)
-        detected_lang = max(probs, key=probs.get)
-
+        # Use transcribe directly - handles language detection internally
+        # This is more compatible with different Whisper versions
         transcription = whisper_model.transcribe(audio_path, task='translate', fp16=False)
+        detected_lang = transcription.get("language", "unknown")
+
         return transcription["text"], detected_lang
     except Exception as e:
         logger.error(f"Error processing audio file: {e}")

@@ -101,30 +101,20 @@ def create_whisper_srt_app(whisper_model_name: str, model_name: str, temperature
                 st.write("📥 Loading Whisper model...")
                 loaded_model = load_whisper_model(whisper_model_name)
 
-                # Temporary storage for video file
+                # Temporary storage for video file with proper extension
                 st.write("💾 Saving video file...")
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".tmp") as temp_video:
+                file_ext = video_file.name.rsplit('.', 1)[-1] if '.' in video_file.name else 'mp4'
+                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_ext}") as temp_video:
                     temp_video.write(video_file.read())
                     video_file_abs_path = os.path.abspath(temp_video.name)
 
-                # Load and process audio from video
-                st.write("🎵 Extracting audio from video...")
-                audio = whisper.load_audio(video_file_abs_path)
-                audio = whisper.pad_or_trim(audio)
-
-                # Generate Mel spectrogram
-                mel = whisper.log_mel_spectrogram(audio).to(loaded_model.device)
-
-                # Language detection
-                _, probs = loaded_model.detect_language(mel)
-                detected_language = max(probs, key=probs.get)
-                st.write(f"🌍 Detected language: **{detected_language.upper()}**")
-
-                # Transcription process
-                st.write("✍️ Transcribing video content...")
+                # Transcription process - use transcribe directly for better compatibility
+                st.write("🎵 Extracting audio and transcribing...")
 
                 # Generate transcription segments
                 transcription = loaded_model.transcribe(video_file_abs_path, fp16=False)
+                detected_language = transcription.get('language', 'unknown')
+                st.write(f"🌍 Detected language: **{detected_language.upper()}**")
                 segments = transcription['segments']
                 segment_srt = ""
 

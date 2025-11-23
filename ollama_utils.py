@@ -46,7 +46,14 @@ def get_models() -> List[str]:
         List of model names
     """
     try:
-        return [model["name"] for model in ollama.list()["models"]]
+        response = ollama.list()
+        # Handle both old dict-style and new Pydantic-style responses
+        if hasattr(response, 'models'):
+            # New Pydantic model (ollama >= 0.4)
+            return [m.model if hasattr(m, 'model') else m.name for m in response.models]
+        else:
+            # Old dict-style response
+            return [model["name"] for model in response["models"]]
     except Exception as e:
         logger.warning(f"Could not fetch Ollama models: {e}. Using default.")
         return [Config.MODEL_NAME]

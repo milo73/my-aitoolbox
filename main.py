@@ -11,8 +11,10 @@ from config import Config
 # Import functions from individual apps
 from ollama_chat_app import create_ollama_chat_app
 from whisper_app import create_whisper_app
+from whisper_transcribe_app import create_whisper_transcribe_app
 from web_summary_app import create_web_summary_app
 from whisper_srt_app import create_whisper_srt_app
+import ollama_utils
 
 # Configure Streamlit page
 st.set_page_config(
@@ -58,10 +60,24 @@ with st.sidebar:
 
     # LLM Model Configuration
     with st.expander("🤖 LLM Model", expanded=True):
-        model_name = st.text_input(
-            "Model name",
-            value=Config.MODEL_NAME,
-            help="Enter the name of your Ollama model (e.g., llama3, mistral, codellama)"
+        # Fetch available models from Ollama
+        available_models = ollama_utils.get_models()
+
+        # Determine default index
+        default_model = Config.MODEL_NAME
+        if default_model in available_models:
+            default_index = available_models.index(default_model)
+        elif available_models:
+            default_index = 0
+        else:
+            default_index = 0
+            available_models = [default_model]  # Fallback if no models found
+
+        model_name = st.selectbox(
+            "Select Model",
+            options=available_models,
+            index=default_index,
+            help="Select from available Ollama models"
         )
         temperature = st.slider(
             "Temperature",
@@ -72,6 +88,11 @@ with st.sidebar:
             help="Higher values make output more random, lower values more deterministic"
         )
         st.session_state.selected_model = model_name
+
+        # Refresh button for models
+        if st.button("🔄 Refresh Models", use_container_width=True):
+            st.cache_data.clear()
+            st.rerun()
 
     # Whisper Model Configuration
     with st.expander("🎙️ Whisper Model", expanded=False):
@@ -91,6 +112,7 @@ with st.sidebar:
         **AI Toolbox** provides:
         - 💬 Chat with local LLMs via Ollama
         - 🎙️ Audio transcription & summarization
+        - 🎧 Pure audio transcription (multi-format)
         - 🌐 Web content summarization
         - 📝 Video subtitle generation
 
@@ -104,11 +126,12 @@ with st.sidebar:
     st.caption("Made with ❤️ using Streamlit, Ollama & Whisper")
 
 # Create tabs for each app
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "💬 Ollama Chat",
     "🎙️ Audio Summary",
+    "🎧 Transcription",
     "🌐 Website Summary",
-    "📝 Subtitle Creation"
+    "📝 Subtitles"
 ])
 
 with tab1:
@@ -118,7 +141,10 @@ with tab2:
     create_whisper_app(whisper_model, model_name, temperature)
 
 with tab3:
-    create_web_summary_app(model_name, temperature)
+    create_whisper_transcribe_app(whisper_model, model_name, temperature)
 
 with tab4:
+    create_web_summary_app(model_name, temperature)
+
+with tab5:
     create_whisper_srt_app(whisper_model, model_name, temperature)

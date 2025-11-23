@@ -23,8 +23,8 @@ class Config:
     """Application configuration class."""
 
     # Model configuration
-    MODEL_NAME: str = os.getenv("MODEL_NAME", "llama3")
-    WHISPER_MODEL: str = os.getenv("WHISPER_MODEL", "base")
+    MODEL_NAME: str = os.getenv("MODEL_NAME", "gemma3:27b")
+    WHISPER_MODEL: str = os.getenv("WHISPER_MODEL", "large")
 
     # API configuration (currently not used but kept for future use)
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
