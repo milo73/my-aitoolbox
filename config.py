@@ -34,7 +34,7 @@ class Config:
     MAX_UPLOAD_SIZE_MB: int = 500
     SUPPORTED_AUDIO_FORMATS: List[str] = ["wav", "mp3", "m4a"]
     SUPPORTED_VIDEO_FORMATS: List[str] = ["mp4", "mov"]
-    WHISPER_MODEL_OPTIONS: List[str] = ["tiny", "base", "small", "medium", "large"]
+    WHISPER_MODEL_OPTIONS: List[str] = ["tiny", "base", "small", "medium", "large", "turbo"]
 
     # Validate critical configuration
     @classmethod

@@ -5,6 +5,7 @@ import streamlit as st
 import whisper
 import tempfile
 import os
+import subprocess
 import logging
 import json
 from typing import Tuple, List, Dict
@@ -154,6 +155,7 @@ def create_whisper_transcribe_app(whisper_model_name: str, model_name: str, temp
             return
 
         audio_path = None
+        converted_path = None
         try:
             with st.status("🔄 Transcribing audio...", expanded=True) as status:
                 # Load model
@@ -167,11 +169,29 @@ def create_whisper_transcribe_app(whisper_model_name: str, model_name: str, temp
                     temp_audio.write(audio_file.read())
                     audio_path = temp_audio.name
 
+                # For problematic formats like M4A, convert to WAV first using FFmpeg
+                if file_ext.lower() in ['m4a', 'aac', 'flac', 'ogg', 'webm']:
+                    st.write("🔄 Converting audio format...")
+                    import subprocess
+                    converted_path = audio_path.rsplit('.', 1)[0] + '_converted.wav'
+                    try:
+                        subprocess.run(
+                            ['ffmpeg', '-i', audio_path, '-ar', '16000', '-ac', '1', '-c:a', 'pcm_s16le', converted_path],
+                            check=True,
+                            capture_output=True
+                        )
+                        transcribe_path = converted_path
+                    except subprocess.CalledProcessError as e:
+                        logger.warning(f"FFmpeg conversion failed: {e}. Using original file.")
+                        transcribe_path = audio_path
+                else:
+                    transcribe_path = audio_path
+
                 # Transcribe
                 st.write("✍️ Transcribing...")
                 lang = None if language == "Auto-detect" else language
                 result = model.transcribe(
-                    audio_path,
+                    transcribe_path,
                     task=task,
                     language=lang,
                     fp16=False
@@ -180,14 +200,14 @@ def create_whisper_transcribe_app(whisper_model_name: str, model_name: str, temp
                 detected_lang = result.get('language', 'unknown')
                 segments = result['segments']
 
-                status.update(label="✅ Transcription complete!", state="complete", expanded=False)
+                # Store in session state for persistence BEFORE updating status
+                st.session_state.transcription_result = {
+                    'segments': segments,
+                    'language': detected_lang,
+                    'filename': audio_file.name.rsplit('.', 1)[0]
+                }
 
-            # Store in session state for persistence
-            st.session_state.transcription_result = {
-                'segments': segments,
-                'language': detected_lang,
-                'filename': audio_file.name.rsplit('.', 1)[0]
-            }
+                status.update(label="✅ Transcription complete!", state="complete", expanded=False)
 
         except Exception as e:
             logger.error(f"Error transcribing audio: {e}")
@@ -196,11 +216,17 @@ def create_whisper_transcribe_app(whisper_model_name: str, model_name: str, temp
             st.info("💡 **Troubleshooting:**\n- Ensure the audio file is valid\n- Try a different format\n- Check if FFmpeg is installed")
 
         finally:
+            # Clean up temp files
             if audio_path and os.path.exists(audio_path):
                 try:
                     os.remove(audio_path)
                 except Exception as e:
                     logger.warning(f"Could not remove temp file: {e}")
+            if converted_path and os.path.exists(converted_path):
+                try:
+                    os.remove(converted_path)
+                except Exception as e:
+                    logger.warning(f"Could not remove converted file: {e}")
 
     # Display results if available
     if 'transcription_result' in st.session_state:

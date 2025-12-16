@@ -69,8 +69,8 @@ def create_whisper_app(whisper_model: str, model_name: str, temperature: float) 
             st.error("⚠️ Please upload an audio file first!")
             return
 
-        with st.status("🔄 Processing audio...", expanded=True) as status:
-            try:
+        try:
+            with st.status("🔄 Processing audio...", expanded=True) as status:
                 st.write("📥 Loading Whisper model...")
                 loaded_model = whisper.load_model(whisper_model)
 
@@ -79,46 +79,46 @@ def create_whisper_app(whisper_model: str, model_name: str, temperature: float) 
 
                 status.update(label="✅ Transcription complete!", state="complete", expanded=False)
 
-                # Results in tabs
-                result_tab1, result_tab2, result_tab3 = st.tabs(["📝 Summary", "📄 Transcription", "ℹ️ Details"])
+            # Results in tabs - OUTSIDE the status block so they persist
+            result_tab1, result_tab2, result_tab3 = st.tabs(["📝 Summary", "📄 Transcription", "ℹ️ Details"])
 
-                with result_tab1:
-                    st.markdown("### 📝 AI Summary")
-                    with st.spinner("🤖 Generating summary with AI..."):
-                        summary = summarize_text(model_name, system_prompt, transcription, temperature)
-                    st.markdown(summary)
-                    st.download_button(
-                        "💾 Download Summary",
-                        summary,
-                        file_name="summary.txt",
-                        mime="text/plain"
-                    )
+            with result_tab1:
+                st.markdown("### 📝 AI Summary")
+                with st.spinner("🤖 Generating summary with AI..."):
+                    summary = summarize_text(model_name, system_prompt, transcription, temperature)
+                st.markdown(summary)
+                st.download_button(
+                    "💾 Download Summary",
+                    summary,
+                    file_name="summary.txt",
+                    mime="text/plain"
+                )
 
-                with result_tab2:
-                    st.markdown("### 📄 Full Transcription")
-                    st.markdown(transcription)
-                    st.download_button(
-                        "💾 Download Transcription",
-                        transcription,
-                        file_name="transcription.txt",
-                        mime="text/plain"
-                    )
+            with result_tab2:
+                st.markdown("### 📄 Full Transcription")
+                st.markdown(transcription)
+                st.download_button(
+                    "💾 Download Transcription",
+                    transcription,
+                    file_name="transcription.txt",
+                    mime="text/plain"
+                )
 
-                with result_tab3:
-                    st.markdown("### ℹ️ Metadata")
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.metric("🌍 Language", language.upper())
-                    with col2:
-                        st.metric("📊 Model", whisper_model)
-                    with col3:
-                        st.metric("📏 Length", f"{len(transcription.split())} words")
+            with result_tab3:
+                st.markdown("### ℹ️ Metadata")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("🌍 Language", language.upper())
+                with col2:
+                    st.metric("📊 Model", whisper_model)
+                with col3:
+                    st.metric("📏 Length", f"{len(transcription.split())} words")
 
-            except Exception as e:
-                logger.error(f"Error processing audio: {e}")
-                st.error(f"❌ **Processing Error**")
-                st.error(f"Details: {str(e)}")
-                st.info("💡 **Troubleshooting:**\n- Ensure the audio file is valid\n- Check if Whisper is properly installed\n- Try a smaller file or different format\n- Ensure FFmpeg is installed")
+        except Exception as e:
+            logger.error(f"Error processing audio: {e}")
+            st.error(f"❌ **Processing Error**")
+            st.error(f"Details: {str(e)}")
+            st.info("💡 **Troubleshooting:**\n- Ensure the audio file is valid\n- Check if Whisper is properly installed\n- Try a smaller file or different format\n- Ensure FFmpeg is installed")
 
 def process_audio(audio_file, whisper_model) -> Tuple[str, str]:
     """

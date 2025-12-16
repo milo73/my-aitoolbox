@@ -130,54 +130,54 @@ def create_whisper_srt_app(whisper_model_name: str, model_name: str, temperature
 
                 status.update(label="✅ Subtitles generated successfully!", state="complete", expanded=False)
 
-                # Display results in tabs
-                st.success(f"🎉 Successfully generated {len(segments)} subtitle segments!")
+            # Display results in tabs - OUTSIDE status block so they persist
+            st.success(f"🎉 Successfully generated {len(segments)} subtitle segments!")
 
-                tab1, tab2, tab3 = st.tabs(["📝 Preview", "💾 Download", "📊 Statistics"])
+            tab1, tab2, tab3 = st.tabs(["📝 Preview", "💾 Download", "📊 Statistics"])
 
-                with tab1:
-                    st.markdown("### 📝 Subtitle Preview")
-                    st.text_area(
-                        "SRT Content",
-                        segment_srt,
-                        height=400,
-                        help="This is the standard SRT format that can be used in video players and editors"
-                    )
+            with tab1:
+                st.markdown("### 📝 Subtitle Preview")
+                st.text_area(
+                    "SRT Content",
+                    segment_srt,
+                    height=400,
+                    help="This is the standard SRT format that can be used in video players and editors"
+                )
 
-                with tab2:
-                    st.markdown("### 💾 Download Subtitles")
-                    st.download_button(
-                        label="📥 Download SRT File",
-                        data=segment_srt,
-                        file_name=f"{video_file.name.rsplit('.', 1)[0]}_subtitles.srt",
-                        mime="text/plain",
-                        use_container_width=True,
-                        type="primary"
-                    )
-                    st.info("💡 **Tip:** Import this SRT file into your video editor or player to display subtitles synchronized with your video.")
+            with tab2:
+                st.markdown("### 💾 Download Subtitles")
+                st.download_button(
+                    label="📥 Download SRT File",
+                    data=segment_srt,
+                    file_name=f"{video_file.name.rsplit('.', 1)[0]}_subtitles.srt",
+                    mime="text/plain",
+                    use_container_width=True,
+                    type="primary"
+                )
+                st.info("💡 **Tip:** Import this SRT file into your video editor or player to display subtitles synchronized with your video.")
 
-                    st.markdown("---")
-                    st.markdown("**🎬 How to use SRT files:**")
-                    st.markdown("""
-                    - **VLC Player:** Right-click video → Subtitle → Add Subtitle File
-                    - **YouTube:** Upload video → Subtitles → Upload file
-                    - **Premiere Pro:** Import SRT file and sync with video timeline
-                    """)
+                st.markdown("---")
+                st.markdown("**🎬 How to use SRT files:**")
+                st.markdown("""
+                - **VLC Player:** Right-click video → Subtitle → Add Subtitle File
+                - **YouTube:** Upload video → Subtitles → Upload file
+                - **Premiere Pro:** Import SRT file and sync with video timeline
+                """)
 
-                with tab3:
-                    st.markdown("### 📊 Transcription Statistics")
+            with tab3:
+                st.markdown("### 📊 Transcription Statistics")
 
-                    col1, col2, col3, col4 = st.columns(4)
-                    with col1:
-                        st.metric("🌍 Language", detected_language.upper())
-                    with col2:
-                        st.metric("📝 Segments", len(segments))
-                    with col3:
-                        total_words = sum(len(seg['text'].split()) for seg in segments)
-                        st.metric("📖 Words", total_words)
-                    with col4:
-                        duration = segments[-1]['end'] if segments else 0
-                        st.metric("⏱️ Duration", f"{int(duration // 60)}:{int(duration % 60):02d}")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("🌍 Language", detected_language.upper())
+                with col2:
+                    st.metric("📝 Segments", len(segments))
+                with col3:
+                    total_words = sum(len(seg['text'].split()) for seg in segments)
+                    st.metric("📖 Words", total_words)
+                with col4:
+                    duration = segments[-1]['end'] if segments else 0
+                    st.metric("⏱️ Duration", f"{int(duration // 60)}:{int(duration % 60):02d}")
 
         except Exception as e:
             logger.error(f"Error transcribing video: {e}")

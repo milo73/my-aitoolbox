@@ -96,13 +96,15 @@ with st.sidebar:
 
     # Whisper Model Configuration
     with st.expander("🎙️ Whisper Model", expanded=False):
+        whisper_options = ["tiny", "base", "small", "medium", "large", "turbo"]
+        whisper_default = Config.WHISPER_MODEL if Config.WHISPER_MODEL in whisper_options else "large"
         whisper_model = st.selectbox(
             "Model size",
-            options=["tiny", "base", "small", "medium", "large"],
-            index=["tiny", "base", "small", "medium", "large"].index(Config.WHISPER_MODEL) if Config.WHISPER_MODEL in ["tiny", "base", "small", "medium", "large"] else 1,
-            help="Larger models are more accurate but slower. Base is recommended for most use cases."
+            options=whisper_options,
+            index=whisper_options.index(whisper_default),
+            help="Larger models are more accurate but slower. Turbo is the fastest large model."
         )
-        st.info("💡 **Model sizes:**\n- Tiny: Fastest, least accurate\n- Base: Good balance\n- Small: Better accuracy\n- Medium/Large: Best accuracy, slower")
+        st.info("💡 **Model sizes:**\n- Tiny: Fastest, least accurate\n- Base: Good balance\n- Small: Better accuracy\n- Medium: High accuracy\n- Large: Best accuracy, slower\n- Turbo: Fast + accurate (large-v3)")
 
     st.markdown("---")
 
